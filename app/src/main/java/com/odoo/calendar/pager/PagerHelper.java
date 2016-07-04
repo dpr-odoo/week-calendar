@@ -1,7 +1,5 @@
 package com.odoo.calendar.pager;
 
-import java.util.List;
-
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -15,10 +13,12 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.odoo.calander.R;
+import com.odoo.calendar.R;
 import com.odoo.calendar.SysCal;
 import com.odoo.calendar.SysCal.DateInfo;
 import com.odoo.calendar.view.OdooCalendar.OdooCalendarDateSelectListener;
+
+import java.util.List;
 
 /**
  * 

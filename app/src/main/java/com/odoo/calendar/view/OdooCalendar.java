@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import com.odoo.calander.R;
+import com.odoo.calendar.R;
 import com.odoo.calendar.SysCal.DateInfo;
 import com.odoo.calendar.pager.PagerHelper;
 import com.odoo.calendar.pager.PagerHelper.PagerViewGenerateListener;
@@ -47,13 +47,15 @@ public class OdooCalendar extends LinearLayout implements
     }
 
     private void init(Context context, AttributeSet attrs) {
-        LinearLayout mParent = (LinearLayout) LayoutInflater.from(context).inflate(
-                R.layout.event_container, this, false);
-        setOrientation(LinearLayout.VERTICAL);
-        helper = new PagerHelper(context, mParent);
-        mEventsView = (LinearLayout) mParent
-                .findViewById(R.id.events_container_view);
-        addView(mParent);
+        if (!isInEditMode()) {
+            LinearLayout mParent = (LinearLayout) LayoutInflater.from(context).inflate(
+                    R.layout.event_container, this, false);
+            setOrientation(LinearLayout.VERTICAL);
+            helper = new PagerHelper(context, mParent);
+            mEventsView = (LinearLayout) mParent
+                    .findViewById(R.id.events_container_view);
+            addView(mParent);
+        }
     }
 
     public void setOdooCalendarDateSelectListener(
