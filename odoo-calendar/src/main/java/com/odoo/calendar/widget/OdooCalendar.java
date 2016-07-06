@@ -24,10 +24,11 @@ import java.util.Locale;
 
 public class OdooCalendar extends ViewPager {
 
+    public static final String TAG = OdooCalendar.class.getSimpleName();
     private Context mContext;
     private SysCalUtils calendar;
     private View currentWeekView;
-    private int currentWeekOfYear = -1;
+    private int activeYear = -1;
     private int focusDay = -1;
     private View recentClicked = null;
     private CalendarWeekDayFilterListener mCalendarWeekDayFilterListener;
@@ -47,6 +48,7 @@ public class OdooCalendar extends ViewPager {
         if (!isInEditMode()) {
             mContext = context;
             calendar = new SysCalUtils();
+            activeYear = calendar.getYear();
             post(new Runnable() {
                 @Override
                 public void run() {
@@ -61,14 +63,14 @@ public class OdooCalendar extends ViewPager {
         setOffscreenPageLimit(calendar.getWeeksOfTheYear());
         setAdapter(adapter);
         addOnPageChangeListener(pageChangeListener);
-        focusOnWeek(calendar.getWeekOfYear());
+        focusOnWeek(calendar.getWeekOfYear(activeYear));
     }
 
     @Override
     public void setAdapter(PagerAdapter adapter) {
         super.setAdapter(adapter);
         // Setting current item to current week
-        setCurrentItem(calendar.getWeekOfYear());
+        setCurrentItem(calendar.getWeekOfYear(activeYear));
     }
 
     private class OdooCalendarAdapter extends PagerAdapter {
@@ -76,19 +78,35 @@ public class OdooCalendar extends ViewPager {
         private List<View> views = new ArrayList<>();
 
         public OdooCalendarAdapter() {
-            for (int i = 0; i <= calendar.getWeeksOfTheYear(); i++) {
+            bindViews();
+        }
+
+        public void bindViews() {
+            views.clear();
+            int totalWeeks = 53;
+            views.add(0, getFakeView(0));
+            for (int i = 1; i <= totalWeeks; i++) {
                 LinearLayout weekView = (LinearLayout) LayoutInflater.from(mContext)
                         .inflate(R.layout.calendar_week_view, null, false);
                 bindWeekView(weekView, i);
                 weekView.setLayoutTransition(new LayoutTransition());
                 views.add(i, weekView);
             }
+            views.add(totalWeeks + 1, getFakeView(totalWeeks + 1));
             notifyDataSetChanged();
+        }
+
+        private View getFakeView(int week) {
+            LinearLayout fakeWeekView = (LinearLayout) LayoutInflater.from(mContext)
+                    .inflate(R.layout.calendar_week_view, null, false);
+            bindWeekView(fakeWeekView, week);
+            fakeWeekView.setLayoutTransition(new LayoutTransition());
+            return fakeWeekView;
         }
 
         @Override
         public int getCount() {
-            return calendar.getWeeksOfTheYear() + 1;
+            return views.size();
         }
 
         @Override
@@ -99,13 +117,16 @@ public class OdooCalendar extends ViewPager {
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             View view = views.get(position);
+            if (view.getParent() != null) {
+                ((ViewGroup) view.getParent()).removeView(view);
+            }
             container.addView(view);
             return view;
         }
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeView(views.get(position));
+            container.removeView((View) object);
         }
 
         @Override
@@ -120,11 +141,12 @@ public class OdooCalendar extends ViewPager {
         public View getView(int position) {
             return views.get(position);
         }
+
     }
 
     private void bindWeekView(View view, int weekOfYear) {
         TextView monthName = (TextView) view.findViewById(R.id.monthName);
-        monthName.setText(calendar.getMonthDisplayName(weekOfYear));
+        monthName.setText(calendar.getMonthDisplayName(activeYear, weekOfYear));
 
         TextView monTitle, tueTitle, wedTitle, thuTitle, friTitle, satTitle, sunTitle;
         monTitle = (TextView) view.findViewById(R.id.monTitle);
@@ -152,24 +174,23 @@ public class OdooCalendar extends ViewPager {
         satValue = (TextView) view.findViewById(R.id.satValue);
         sunValue = (TextView) view.findViewById(R.id.sunValue);
 
-        monValue.setText(calendar.getDayDisplayValue(1, weekOfYear));
-        tueValue.setText(calendar.getDayDisplayValue(2, weekOfYear));
-        wedValue.setText(calendar.getDayDisplayValue(3, weekOfYear));
-        thuValue.setText(calendar.getDayDisplayValue(4, weekOfYear));
-        friValue.setText(calendar.getDayDisplayValue(5, weekOfYear));
-        satValue.setText(calendar.getDayDisplayValue(6, weekOfYear));
-        sunValue.setText(calendar.getDayDisplayValue(7, weekOfYear));
+        monValue.setText(calendar.getDayDisplayValue(activeYear, 1, weekOfYear));
+        tueValue.setText(calendar.getDayDisplayValue(activeYear, 2, weekOfYear));
+        wedValue.setText(calendar.getDayDisplayValue(activeYear, 3, weekOfYear));
+        thuValue.setText(calendar.getDayDisplayValue(activeYear, 4, weekOfYear));
+        friValue.setText(calendar.getDayDisplayValue(activeYear, 5, weekOfYear));
+        satValue.setText(calendar.getDayDisplayValue(activeYear, 6, weekOfYear));
+        sunValue.setText(calendar.getDayDisplayValue(activeYear, 7, weekOfYear));
     }
 
     public void focusOnWeek(int weekOfYear) {
-        currentWeekOfYear = weekOfYear;
         OdooCalendarAdapter adapter = (OdooCalendarAdapter) getAdapter();
         currentWeekView = adapter.getView(weekOfYear);
 
         View[] days = new View[7];
         for (int i = 1; i <= 7; i++) {
             days[i - 1] = getDayView(i);
-            days[i - 1].setTag(calendar.getDateInfo(i, weekOfYear));
+            days[i - 1].setTag(calendar.getDateInfo(activeYear, i, weekOfYear));
             days[i - 1].setOnClickListener(dayClick);
         }
         focusOnDay(calendar.getDayOfWeek());
@@ -239,6 +260,22 @@ public class OdooCalendar extends ViewPager {
 
         @Override
         public void onPageSelected(int position) {
+            OdooCalendarAdapter adapter = (OdooCalendarAdapter) getAdapter();
+            int weekDay = calendar.getWeekDaysDiff(activeYear);
+            int nextYearPosition = (weekDay % 7 == 0) ? adapter.getCount() - 1 : adapter.getCount() - 2;
+            if (position == 0) {
+                activeYear = activeYear - 1;
+                adapter.bindViews();
+                weekDay = calendar.getWeekDaysDiff(activeYear);
+                nextYearPosition = (weekDay % 7 == 0) ? adapter.getCount() - 1 : adapter.getCount() - 2;
+                setCurrentItem(nextYearPosition - 1, false);
+                return;
+            } else if (position == nextYearPosition) {
+                activeYear = activeYear + 1;
+                adapter.bindViews();
+                setCurrentItem(1, false);
+                return;
+            }
             recentClicked = null;
             focusOnWeek(position);
         }
@@ -271,10 +308,11 @@ public class OdooCalendar extends ViewPager {
     }
 
     public void gotoToday() {
-        setCurrentItem(calendar.getWeekOfYear(), true);
+        activeYear = calendar.getYear();
+        setCurrentItem(calendar.getWeekOfYear(activeYear) - 1, true);
         focusDay = -1;
         recentClicked = null;
-        focusOnWeek(calendar.getWeekOfYear());
+        focusOnWeek(calendar.getWeekOfYear(activeYear));
     }
 
     public void setCalendarDateChangeListener(CalendarDateChangeListener callback) {
