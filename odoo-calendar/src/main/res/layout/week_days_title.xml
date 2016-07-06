@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingBottom="8dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp">
+
+    <!--Monday-->
+    <LinearLayout
+        android:id="@+id/dayMonday"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:layout_weight="1"
+        android:background="?android:attr/selectableItemBackground"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/monTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAllCaps="true"
+            android:textColor="@color/color_week_day"
+            android:textSize="@dimen/calendar_day_font" />
+
+
+    </LinearLayout>
+
+    <!--Tuesday-->
+    <LinearLayout
+        android:id="@+id/dayTuesday"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:layout_weight="1"
+        android:background="?android:attr/selectableItemBackground"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tueTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAllCaps="true"
+            android:textColor="@color/color_week_day"
+            android:textSize="@dimen/calendar_day_font" />
+
+
+    </LinearLayout>
+
+    <!--Wednesday-->
+    <LinearLayout
+        android:id="@+id/dayWednesday"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:layout_weight="1"
+        android:background="?android:attr/selectableItemBackground"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/wedTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAllCaps="true"
+            android:textColor="@color/color_week_day"
+            android:textSize="@dimen/calendar_day_font" />
+
+
+    </LinearLayout>
+
+    <!--Thursday-->
+    <LinearLayout
+        android:id="@+id/dayThursday"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:layout_weight="1"
+        android:background="?android:attr/selectableItemBackground"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/thuTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAllCaps="true"
+            android:textColor="@color/color_week_day"
+            android:textSize="@dimen/calendar_day_font" />
+
+
+    </LinearLayout>
+
+    <!--Friday-->
+    <LinearLayout
+        android:id="@+id/dayFriday"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:layout_weight="1"
+        android:background="?android:attr/selectableItemBackground"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/friTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAllCaps="true"
+            android:textColor="@color/color_week_day"
+            android:textSize="@dimen/calendar_day_font" />
+
+
+    </LinearLayout>
+
+    <!--Saturday-->
+    <LinearLayout
+        android:id="@+id/daySaturday"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:layout_weight="1"
+        android:background="?android:attr/selectableItemBackground"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/satTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAllCaps="true"
+            android:textColor="@color/color_week_day"
+            android:textSize="@dimen/calendar_day_font" />
+
+
+    </LinearLayout>
+
+    <!--Sunday-->
+    <LinearLayout
+        android:id="@+id/daySunday"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="?android:attr/selectableItemBackground"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/sunTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAllCaps="true"
+            android:textColor="@color/color_week_day"
+            android:textSize="@dimen/calendar_day_font" />
+
+    </LinearLayout>
+
+</LinearLayout>

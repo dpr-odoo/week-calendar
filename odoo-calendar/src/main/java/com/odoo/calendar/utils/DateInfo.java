@@ -16,4 +16,9 @@ public class DateInfo {
     public String toString() {
         return String.format(Locale.getDefault(), "%d-%02d-%02d", year, monthOfYear, dayOfMonth);
     }
+
+    public String getMonthName() {
+        SysCalUtils sysCalUtils = new SysCalUtils();
+        return sysCalUtils.getMonthDisplayName(year, monthOfYear - 1);
+    }
 }
