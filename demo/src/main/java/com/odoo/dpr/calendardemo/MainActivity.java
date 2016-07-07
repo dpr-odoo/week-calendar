@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements CalendarDateChang
 
     @Override
     public boolean hasDataForDate(DateInfo date) {
-        return date.dayOfMonth == 7 && date.monthOfYear == 7;
+        return (date.dayOfMonth == 7 && date.monthOfYear == 7) ||
+                (date.dayOfMonth == 25 && date.monthOfYear == 7);
     }
 }

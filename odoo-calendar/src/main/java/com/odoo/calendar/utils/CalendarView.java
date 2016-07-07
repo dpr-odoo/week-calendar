@@ -2,10 +2,10 @@ package com.odoo.calendar.utils;
 
 import android.animation.LayoutTransition;
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +30,7 @@ public class CalendarView extends ViewPager {
     private View currentWeekView, currentMonthView;
     private int activeYear = -1;
     private int focusDay = -1;
+    private DateInfo activeDate;
     private View recentClicked = null;
     private boolean isMonthView = false;
     private View titleView;
@@ -95,7 +96,12 @@ public class CalendarView extends ViewPager {
         isMonthView = !isMonthView;
         OdooCalendarAdapter adapter = (OdooCalendarAdapter) getAdapter();
         adapter.bindViews();
-        focusOnMonth(currentWeekOfTheYear);
+        if (isMonthView)
+            focusOnMonth(currentWeekOfTheYear);
+        else {
+            focusOnWeek(currentWeekOfTheYear);
+            setCurrentItem(currentWeekOfTheYear, false);
+        }
     }
 
     private class OdooCalendarAdapter extends PagerAdapter {
@@ -129,6 +135,8 @@ public class CalendarView extends ViewPager {
         private View getWeekView(int week) {
             LinearLayout weekView = (LinearLayout) LayoutInflater.from(mContext)
                     .inflate(R.layout.calendar_week_view, null, false);
+            weekView.setTag("week_number_" + week);
+            weekView.setTag(R.string.week_number, week);
             bindWeekView(weekView, week);
             weekView.setLayoutTransition(new LayoutTransition());
             return weekView;
@@ -138,8 +146,11 @@ public class CalendarView extends ViewPager {
             int[] weeks = calendar.getWeeksOfTheMonth(activeYear, month);
             LinearLayout parent = new LinearLayout(mContext);
             parent.setOrientation(LinearLayout.VERTICAL);
+            parent.setLayoutTransition(new LayoutTransition());
             for (int i = weeks[0]; i <= weeks[1]; i++) {
                 View view = LayoutInflater.from(mContext).inflate(R.layout.calendar_week_view, null, false);
+                view.setTag("week_number_" + i);
+                view.setTag(R.string.week_number, i);
                 bindWeekView(view, i);
                 parent.addView(view);
             }
@@ -240,38 +251,64 @@ public class CalendarView extends ViewPager {
         focusOnDay(calendar.getDayOfWeek());
     }
 
+    public void focusOnMonthWeek(int month, int week) {
+        currentWeekOfTheYear = week;
+        OdooCalendarAdapter adapter = (OdooCalendarAdapter) getAdapter();
+        currentMonthView = adapter.getView(month);
+        currentWeekView = currentMonthView.findViewWithTag("week_number_" + week);
+        ViewGroup monthView = (ViewGroup) currentMonthView;
+        for (int child = 0; child < monthView.getChildCount(); child++) {
+            View weekView = monthView.getChildAt(child);
+            int weekNumber = (int) weekView.getTag(R.string.week_number);
+            for (int i = 1; i <= 7; i++) {
+                DateInfo dateInfo = calendar.getDateInfo(activeYear, i, weekNumber);
+                LinearLayout dateView = (LinearLayout) getDayView(weekView, i);
+                assert dateView != null;
+                dateView.setTag(dateInfo);
+                dateView.setOnClickListener(dayClick);
+                if (dateInfo.monthOfYear - 1 != month) {
+                    TextView dayValue = (TextView) dateView.getChildAt(0);
+                    dayValue.setTextColor(ContextCompat.getColor(mContext, R.color.color_week_day_other_month));
+                }
+            }
+        }
+        focusOnDay(calendar.getDayOfWeek());
+    }
+
     public void focusOnMonth(int weekOfYear) {
         OdooCalendarAdapter adapter = (OdooCalendarAdapter) getAdapter();
         int month = calendar.getMonthOfYear(activeYear, weekOfYear);
         currentMonthView = adapter.getView(month);
         setCurrentItem(month, false);
-        Log.v(">>>", month + " >>> " + currentMonthView);
-        focusOnDay(calendar.getDayOfWeek());
+        focusOnMonthWeek(month, currentWeekOfTheYear);
     }
 
-    private View getDayView(int day) {
+    private View getDayView(View view, int day) {
         switch (day) {
             case 1:
-                return currentWeekView.findViewById(R.id.dayMonday);
+                return view.findViewById(R.id.dayMonday);
             case 2:
-                return currentWeekView.findViewById(R.id.dayTuesday);
+                return view.findViewById(R.id.dayTuesday);
             case 3:
-                return currentWeekView.findViewById(R.id.dayWednesday);
+                return view.findViewById(R.id.dayWednesday);
             case 4:
-                return currentWeekView.findViewById(R.id.dayThursday);
+                return view.findViewById(R.id.dayThursday);
             case 5:
-                return currentWeekView.findViewById(R.id.dayFriday);
+                return view.findViewById(R.id.dayFriday);
             case 6:
-                return currentWeekView.findViewById(R.id.daySaturday);
+                return view.findViewById(R.id.daySaturday);
             case 7:
-                return currentWeekView.findViewById(R.id.daySunday);
+                return view.findViewById(R.id.daySunday);
         }
         return null;
     }
 
-    private void focusOnDay(int day) {
-        View view = (View) getDayView(day).getParent();
-        View[] dayViews = {
+    private View getDayView(int day) {
+        return getDayView(currentWeekView, day);
+    }
+
+    private View[] getDayViews(View view) {
+        return new View[]{
                 view.findViewById(R.id.monValue),
                 view.findViewById(R.id.tueValue),
                 view.findViewById(R.id.wedValue),
@@ -280,6 +317,35 @@ public class CalendarView extends ViewPager {
                 view.findViewById(R.id.satValue),
                 view.findViewById(R.id.sunValue)
         };
+    }
+
+    private void focusOnDate(DateInfo date, View view) {
+        if (mCalendarWeekDayFilterListener != null) {
+            if (mCalendarWeekDayFilterListener.hasDataForDate(date)) {
+                view.setBackgroundResource(R.drawable.week_day_bg_data);
+                return;
+            }
+        }
+        view.setBackgroundResource(R.drawable.week_day_bg_none);
+    }
+
+    private void focusOnDay(int day) {
+
+        if (isMonthView) {
+            // Resetting recent weeks view
+            ViewGroup monthView = (ViewGroup) currentMonthView;
+            for (int i = 0; i < monthView.getChildCount(); i++) {
+                View weekView = monthView.getChildAt(i);
+                View[] dayViews = getDayViews(weekView);
+                for (View view : dayViews) {
+                    ViewGroup dayPrent = (ViewGroup) view.getParent();
+                    focusOnDate((DateInfo) dayPrent.getTag(), view);
+                }
+            }
+        }
+
+        View view = (View) getDayView(day).getParent();
+        View[] dayViews = getDayViews(view);
 
         for (int i = 0; i < dayViews.length; i++) {
             View dayView = dayViews[i];
@@ -287,19 +353,12 @@ public class CalendarView extends ViewPager {
             if ((focusDay != -1 && focusDay == i) || (focusDay == -1 && dateInfo.isToday())) {
                 // to focus
                 dayView.setBackgroundResource(R.drawable.week_day_bg);
-                if (recentClicked == null) {
+                if (activeDate == null) {
+                    activeDate = dateInfo;
                     dayClick.onClick((View) dayView.getParent());
                 }
             } else {
-                if (mCalendarWeekDayFilterListener != null) {
-                    if (mCalendarWeekDayFilterListener.hasDataForDate(dateInfo)) {
-                        dayView.setBackgroundResource(R.drawable.week_day_bg_data);
-                    } else {
-                        dayView.setBackgroundResource(R.drawable.week_day_bg_none);
-                    }
-                } else {
-                    dayView.setBackgroundResource(R.drawable.week_day_bg_none);
-                }
+                focusOnDate(dateInfo, dayView);
             }
 
         }
@@ -344,16 +403,20 @@ public class CalendarView extends ViewPager {
     OnClickListener dayClick = new OnClickListener() {
         @Override
         public void onClick(View view) {
+            if (view.getParent() != null) {
+                currentWeekView = (View) view.getParent().getParent();
+                currentWeekOfTheYear = (int) currentWeekView.getTag(R.string.week_number);
+            }
             if (recentClicked == view) {
                 return;
             }
-            recentClicked = view;
             DateInfo dateInfo = (DateInfo) view.getTag();
+            focusDay = dateInfo.dayOfWeek - 1;
+            focusOnDay(dateInfo.dayOfWeek);
+            recentClicked = view;
             if (mOnMonthChangeListener != null) {
                 mOnMonthChangeListener.onMonthChange(dateInfo);
             }
-            focusDay = dateInfo.dayOfWeek - 1;
-            focusOnDay(dateInfo.dayOfWeek);
             if (mCalendarDateChangeListener != null) {
                 mCalendarDateChangeListener.onCalendarDateChange(dateInfo);
             }
