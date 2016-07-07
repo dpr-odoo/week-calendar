@@ -108,16 +108,36 @@ public class SysCalUtils {
         return calendar.get(Calendar.MONTH);
     }
 
-    public int[] getWeeksOfTheMonth(int year, int month) {
+    public int getStartWeeksOfTheMonth(int year, int month) {
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
         calendar.set(Calendar.DATE, 1);
         calendar.set(Calendar.MONTH, month);
         calendar.set(Calendar.YEAR, year);
-        int startWeek = calendar.get(Calendar.WEEK_OF_YEAR);
+        return calendar.get(Calendar.WEEK_OF_YEAR);
+    }
 
+    public int getEndWeekOfTheMonth(int year, int month) {
+        Calendar calendar = Calendar.getInstance(Locale.getDefault());
+        calendar.set(Calendar.DATE, 1);
+        calendar.set(Calendar.YEAR, year);
         calendar.set(Calendar.MONTH, month + 1);
         calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) - 1);
-        int endWeek = calendar.get(Calendar.WEEK_OF_YEAR);
-        return new int[]{startWeek, endWeek};
+        return calendar.get(Calendar.WEEK_OF_YEAR);
+    }
+
+    public int getNextWeekOfTheMonth(int year, int month, int week) {
+        Calendar calendar = Calendar.getInstance(Locale.getDefault());
+        calendar.set(Calendar.WEEK_OF_YEAR, week + 1);
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month);
+        return calendar.get(Calendar.WEEK_OF_YEAR);
+    }
+
+    public int getWeekOfYearForMonth(int day, int month, int year) {
+        Calendar calendar = Calendar.getInstance(Locale.getDefault());
+        calendar.set(Calendar.DAY_OF_MONTH, day);
+        calendar.set(Calendar.MONTH, month - 1);
+        calendar.set(Calendar.YEAR, year);
+        return calendar.get(Calendar.WEEK_OF_YEAR);
     }
 }

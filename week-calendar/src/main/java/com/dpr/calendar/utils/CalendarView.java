@@ -95,12 +95,16 @@ public class CalendarView extends ViewPager {
     public void toggleWeekMonthView() {
         isMonthView = !isMonthView;
         OdooCalendarAdapter adapter = (OdooCalendarAdapter) getAdapter();
-        adapter.bindViews();
-        if (isMonthView)
-            focusOnMonth(currentWeekOfTheYear);
-        else {
-            focusOnWeek(currentWeekOfTheYear);
+        if (isMonthView) {
+            currentWeekView = null;
+            setCurrentItem(activeDate.monthOfYear, false);
+            adapter.bindViews();
+            focusOnMonth(activeDate.monthOfYear);
+        } else {
+            currentMonthView = null;
+            adapter.bindViews();
             setCurrentItem(currentWeekOfTheYear, false);
+            focusOnWeek(currentWeekOfTheYear);
         }
     }
 
@@ -122,12 +126,11 @@ public class CalendarView extends ViewPager {
                 }
                 views.add(totalWeeks + 1, getWeekView(totalWeeks + 1));
             } else {
-                int totalMonths = 12;
-                views.add(0, getMonthView(0));
+                int totalMonths = 13;
+                views.add(0, getMonthView(activeYear, -1));
                 for (int i = 1; i <= totalMonths; i++) {
-                    views.add(i, getMonthView(i));
+                    views.add(i, getMonthView(activeYear, i - 1));
                 }
-                views.add(totalMonths + 1, getMonthView(totalMonths + 1));
             }
             notifyDataSetChanged();
         }
@@ -137,22 +140,30 @@ public class CalendarView extends ViewPager {
                     .inflate(R.layout.calendar_week_view, null, false);
             weekView.setTag("week_number_" + week);
             weekView.setTag(R.string.week_number, week);
-            bindWeekView(weekView, week);
+            bindWeekView(weekView, week, activeYear);
             weekView.setLayoutTransition(new LayoutTransition());
             return weekView;
         }
 
-        private View getMonthView(int month) {
-            int[] weeks = calendar.getWeeksOfTheMonth(activeYear, month);
+        private View getMonthView(int year, int month) {
+            int activeYear = (month < 0) ? year - 1 : (month == 12) ? year + 1 : year;
+            int startWeek = calendar.getStartWeeksOfTheMonth(activeYear, month);
+            int endWeek = calendar.getEndWeekOfTheMonth(activeYear, month) + 1;
+
             LinearLayout parent = new LinearLayout(mContext);
+            parent.setTag(calendar.getMonthDisplayName(activeYear, month));
             parent.setOrientation(LinearLayout.VERTICAL);
             parent.setLayoutTransition(new LayoutTransition());
-            for (int i = weeks[0]; i <= weeks[1]; i++) {
+            int week = startWeek;
+            for (int i = 1; i <= 6; i++) {
+                if (month < 0 && activeYear < year)
+                    activeYear = (week <= endWeek) ? activeYear + 1 : activeYear;
                 View view = LayoutInflater.from(mContext).inflate(R.layout.calendar_week_view, null, false);
-                view.setTag("week_number_" + i);
-                view.setTag(R.string.week_number, i);
-                bindWeekView(view, i);
+                view.setTag("week_number_" + week);
+                view.setTag(R.string.week_number, week);
+                bindWeekView(view, week, activeYear);
                 parent.addView(view);
+                week = calendar.getNextWeekOfTheMonth(activeYear, month, week);
             }
             return parent;
         }
@@ -201,7 +212,7 @@ public class CalendarView extends ViewPager {
         titleView = view;
     }
 
-    private void bindWeekView(View view, int weekOfYear) {
+    private void bindWeekView(View view, int weekOfYear, int activeYear) {
         TextView monTitle, tueTitle, wedTitle, thuTitle, friTitle, satTitle, sunTitle;
         monTitle = (TextView) titleView.findViewById(R.id.monTitle);
         tueTitle = (TextView) titleView.findViewById(R.id.tueTitle);
@@ -256,6 +267,7 @@ public class CalendarView extends ViewPager {
         OdooCalendarAdapter adapter = (OdooCalendarAdapter) getAdapter();
         currentMonthView = adapter.getView(month);
         currentWeekView = currentMonthView.findViewWithTag("week_number_" + week);
+
         ViewGroup monthView = (ViewGroup) currentMonthView;
         for (int child = 0; child < monthView.getChildCount(); child++) {
             View weekView = monthView.getChildAt(child);
@@ -266,7 +278,7 @@ public class CalendarView extends ViewPager {
                 assert dateView != null;
                 dateView.setTag(dateInfo);
                 dateView.setOnClickListener(dayClick);
-                if (dateInfo.monthOfYear - 1 != month) {
+                if (dateInfo.monthOfYear != month) {
                     TextView dayValue = (TextView) dateView.getChildAt(0);
                     dayValue.setTextColor(ContextCompat.getColor(mContext, R.color.color_week_day_other_month));
                 }
@@ -275,11 +287,7 @@ public class CalendarView extends ViewPager {
         focusOnDay(calendar.getDayOfWeek());
     }
 
-    public void focusOnMonth(int weekOfYear) {
-        OdooCalendarAdapter adapter = (OdooCalendarAdapter) getAdapter();
-        int month = calendar.getMonthOfYear(activeYear, weekOfYear);
-        currentMonthView = adapter.getView(month);
-        setCurrentItem(month, false);
+    public void focusOnMonth(int month) {
         focusOnMonthWeek(month, currentWeekOfTheYear);
     }
 
@@ -352,6 +360,7 @@ public class CalendarView extends ViewPager {
             DateInfo dateInfo = (DateInfo) ((View) dayView.getParent()).getTag();
             if ((focusDay != -1 && focusDay == i) || (focusDay == -1 && dateInfo.isToday())) {
                 // to focus
+                currentWeekOfTheYear = dateInfo.weekOfYear;
                 dayView.setBackgroundResource(R.drawable.week_day_bg);
                 if (activeDate == null) {
                     activeDate = dateInfo;
@@ -391,6 +400,29 @@ public class CalendarView extends ViewPager {
                 }
                 recentClicked = null;
                 focusOnWeek(position);
+            } else {
+                if (mOnMonthChangeListener != null) {
+                    DateInfo dateInfo = new DateInfo();
+                    dateInfo.monthOfYear = position;
+                    dateInfo.year = activeYear;
+                    mOnMonthChangeListener.onMonthChange(dateInfo);
+                }
+                if (position == 0) {
+                    activeYear = activeYear - 1;
+                    adapter.bindViews();
+                    setCurrentItem(12, false);
+                    return;
+                } else if (position == 13) {
+                    activeYear = activeYear + 1;
+                    adapter.bindViews();
+                    setCurrentItem(1, false);
+                    return;
+                }
+                if (currentMonthView != null) {
+                    int weekForMonth = calendar.getWeekOfYearForMonth(activeDate.dayOfMonth,
+                            position, activeYear);
+                    focusOnMonthWeek(position, weekForMonth);
+                }
             }
         }
 
