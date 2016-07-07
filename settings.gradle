@@ -1,1 +1,1 @@
-include ':demo', ':odoo-calendar'
+include ':demo', ':week-calendar'

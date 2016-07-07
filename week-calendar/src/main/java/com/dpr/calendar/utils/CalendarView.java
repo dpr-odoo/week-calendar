@@ -1,4 +1,4 @@
-package com.odoo.calendar.utils;
+package com.dpr.calendar.utils;
 
 import android.animation.LayoutTransition;
 import android.content.Context;
@@ -12,10 +12,10 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.odoo.calendar.R;
-import com.odoo.calendar.listeners.CalendarDateChangeListener;
-import com.odoo.calendar.listeners.CalendarWeekDayFilterListener;
-import com.odoo.calendar.listeners.OnMonthChangeListener;
+import com.dpr.calendar.R;
+import com.dpr.calendar.listeners.CalendarDateChangeListener;
+import com.dpr.calendar.listeners.CalendarWeekDayHighlightListener;
+import com.dpr.calendar.listeners.OnMonthChangeListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -35,7 +35,7 @@ public class CalendarView extends ViewPager {
     private boolean isMonthView = false;
     private View titleView;
     private int currentWeekOfTheYear = -1;
-    private CalendarWeekDayFilterListener mCalendarWeekDayFilterListener;
+    private CalendarWeekDayHighlightListener mCalendarWeekDayHighlightListener;
     private CalendarDateChangeListener mCalendarDateChangeListener;
     private OnMonthChangeListener mOnMonthChangeListener;
 
@@ -320,8 +320,8 @@ public class CalendarView extends ViewPager {
     }
 
     private void focusOnDate(DateInfo date, View view) {
-        if (mCalendarWeekDayFilterListener != null) {
-            if (mCalendarWeekDayFilterListener.hasDataForDate(date)) {
+        if (mCalendarWeekDayHighlightListener != null) {
+            if (mCalendarWeekDayHighlightListener.canHighlightDate(date)) {
                 view.setBackgroundResource(R.drawable.week_day_bg_data);
                 return;
             }
@@ -440,8 +440,8 @@ public class CalendarView extends ViewPager {
         mCalendarDateChangeListener = callback;
     }
 
-    public void setCalendarWeekDayFilterListener(CalendarWeekDayFilterListener callback) {
-        mCalendarWeekDayFilterListener = callback;
+    public void setCalendarWeekDayHighlightListener(CalendarWeekDayHighlightListener callback) {
+        mCalendarWeekDayHighlightListener = callback;
     }
 
     public void setOnMonthChangeListener(OnMonthChangeListener callback) {

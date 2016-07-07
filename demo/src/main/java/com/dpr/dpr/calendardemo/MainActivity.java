@@ -1,27 +1,27 @@
-package com.odoo.dpr.calendardemo;
+package com.dpr.dpr.calendardemo;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
 
-import com.odoo.calendar.listeners.CalendarDateChangeListener;
-import com.odoo.calendar.listeners.CalendarWeekDayFilterListener;
-import com.odoo.calendar.utils.DateInfo;
-import com.odoo.calendar.widget.OdooCalendar;
+import com.dpr.calendar.listeners.CalendarDateChangeListener;
+import com.dpr.calendar.listeners.CalendarWeekDayHighlightListener;
+import com.dpr.calendar.utils.DateInfo;
+import com.dpr.calendar.widget.WeekCalendarView;
 
-public class MainActivity extends AppCompatActivity implements CalendarDateChangeListener, CalendarWeekDayFilterListener {
+public class MainActivity extends AppCompatActivity implements CalendarDateChangeListener, CalendarWeekDayHighlightListener {
 
-    private OdooCalendar odooCalendar;
+    private WeekCalendarView weekCalendar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
-        odooCalendar = (OdooCalendar) findViewById(R.id.odooCalendar);
-        odooCalendar.setCalendarDateChangeListener(this);
-        odooCalendar.setCalendarWeekDayFilterListener(this);
+        weekCalendar = (WeekCalendarView) findViewById(R.id.weekCalendar);
+        weekCalendar.setCalendarDateChangeListener(this);
+        weekCalendar.setCalendarWeekDayHighlightListener(this);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements CalendarDateChang
     }
 
     @Override
-    public boolean hasDataForDate(DateInfo date) {
+    public boolean canHighlightDate(DateInfo date) {
         return (date.dayOfMonth == 7 && date.monthOfYear == 7) ||
                 (date.dayOfMonth == 25 && date.monthOfYear == 7);
     }

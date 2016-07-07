@@ -1,4 +1,4 @@
-package com.odoo.calendar.widget;
+package com.dpr.calendar.widget;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -9,36 +9,36 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.odoo.calendar.R;
-import com.odoo.calendar.listeners.CalendarDateChangeListener;
-import com.odoo.calendar.listeners.CalendarWeekDayFilterListener;
-import com.odoo.calendar.listeners.OnMonthChangeListener;
-import com.odoo.calendar.utils.CalendarView;
-import com.odoo.calendar.utils.DateInfo;
+import com.dpr.calendar.R;
+import com.dpr.calendar.listeners.CalendarDateChangeListener;
+import com.dpr.calendar.listeners.CalendarWeekDayHighlightListener;
+import com.dpr.calendar.listeners.OnMonthChangeListener;
+import com.dpr.calendar.utils.CalendarView;
+import com.dpr.calendar.utils.DateInfo;
 
-public class OdooCalendar extends LinearLayout implements View.OnClickListener, OnMonthChangeListener {
-    public static final String TAG = OdooCalendar.class.getSimpleName();
+public class WeekCalendarView extends LinearLayout implements View.OnClickListener, OnMonthChangeListener {
+    public static final String TAG = WeekCalendarView.class.getSimpleName();
 
     private View view;
     private CalendarView calendarView;
 
-    public OdooCalendar(Context context) {
+    public WeekCalendarView(Context context) {
         super(context);
         init(context);
     }
 
-    public OdooCalendar(Context context, AttributeSet attrs) {
+    public WeekCalendarView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
-    public OdooCalendar(Context context, AttributeSet attrs, int defStyleAttr) {
+    public WeekCalendarView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public OdooCalendar(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public WeekCalendarView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         init(context);
     }
@@ -46,10 +46,10 @@ public class OdooCalendar extends LinearLayout implements View.OnClickListener, 
     private void init(final Context context) {
         if (!isInEditMode()) {
             removeAllViews();
-            view = LayoutInflater.from(context).inflate(R.layout.odoo_calendar, OdooCalendar.this, false);
-            view.findViewById(R.id.monthToggle).setOnClickListener(OdooCalendar.this);
+            view = LayoutInflater.from(context).inflate(R.layout.odoo_calendar, WeekCalendarView.this, false);
+            view.findViewById(R.id.monthToggle).setOnClickListener(WeekCalendarView.this);
             calendarView = (CalendarView) view.findViewById(R.id.calendarView);
-            calendarView.setOnMonthChangeListener(OdooCalendar.this);
+            calendarView.setOnMonthChangeListener(WeekCalendarView.this);
             calendarView.bindWeekTitles(view);
             addView(view);
         }
@@ -64,8 +64,8 @@ public class OdooCalendar extends LinearLayout implements View.OnClickListener, 
         calendarView.setCalendarDateChangeListener(callback);
     }
 
-    public void setCalendarWeekDayFilterListener(CalendarWeekDayFilterListener callback) {
-        calendarView.setCalendarWeekDayFilterListener(callback);
+    public void setCalendarWeekDayHighlightListener(CalendarWeekDayHighlightListener callback) {
+        calendarView.setCalendarWeekDayHighlightListener(callback);
     }
 
     @Override
