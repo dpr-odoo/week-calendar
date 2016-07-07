@@ -1,0 +1,5 @@
+<resources>
+    <dimen name="calendar_day_font">12sp</dimen>
+    <dimen name="calendar_day_size">28dp</dimen>
+    <dimen name="calendar_height">60dp</dimen>
+</resources>
