@@ -50,7 +50,7 @@ public class WeekCalendarView extends LinearLayout implements View.OnClickListen
             view.findViewById(R.id.monthToggle).setOnClickListener(WeekCalendarView.this);
             calendarView = (CalendarView) view.findViewById(R.id.calendarView);
             calendarView.setOnMonthChangeListener(WeekCalendarView.this);
-            calendarView.bindWeekTitles(view);
+//            calendarView.bindWeekTitles(view);
             addView(view);
         }
     }

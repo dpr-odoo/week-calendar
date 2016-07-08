@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/week_days_titles"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingBottom="8dp"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp">
+    android:paddingBottom="8dp">
 
     <!--Monday-->
     <LinearLayout
-        android:id="@+id/dayMonday"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginRight="8dp"
@@ -33,7 +31,6 @@
 
     <!--Tuesday-->
     <LinearLayout
-        android:id="@+id/dayTuesday"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginRight="8dp"
@@ -56,7 +53,6 @@
 
     <!--Wednesday-->
     <LinearLayout
-        android:id="@+id/dayWednesday"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginRight="8dp"
@@ -79,7 +75,6 @@
 
     <!--Thursday-->
     <LinearLayout
-        android:id="@+id/dayThursday"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginRight="8dp"
@@ -102,7 +97,6 @@
 
     <!--Friday-->
     <LinearLayout
-        android:id="@+id/dayFriday"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginRight="8dp"
@@ -125,7 +119,6 @@
 
     <!--Saturday-->
     <LinearLayout
-        android:id="@+id/daySaturday"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginRight="8dp"
@@ -148,7 +141,6 @@
 
     <!--Sunday-->
     <LinearLayout
-        android:id="@+id/daySunday"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"

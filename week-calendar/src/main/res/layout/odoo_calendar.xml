@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/colorPrimary"
-    android:paddingBottom="8dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingBottom="8dp">
 
     <LinearLayout
         android:id="@+id/monthToggle"
@@ -30,8 +30,6 @@
             android:src="@drawable/ic_expand_more"
             android:tint="#fff" />
     </LinearLayout>
-
-    <include layout="@layout/week_days_title" />
 
     <com.dpr.calendar.utils.CalendarView
         android:id="@+id/calendarView"

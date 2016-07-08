@@ -33,7 +33,6 @@ public class CalendarView extends ViewPager {
     private DateInfo activeDate;
     private View recentClicked = null;
     private boolean isMonthView = false;
-    private View titleView;
     private int currentWeekOfTheYear = -1;
     private CalendarWeekDayHighlightListener mCalendarWeekDayHighlightListener;
     private CalendarDateChangeListener mCalendarDateChangeListener;
@@ -142,6 +141,7 @@ public class CalendarView extends ViewPager {
             weekView.setTag(R.string.week_number, week);
             bindWeekView(weekView, week, activeYear);
             weekView.setLayoutTransition(new LayoutTransition());
+            bindWeekTitles(weekView);
             return weekView;
         }
 
@@ -162,6 +162,11 @@ public class CalendarView extends ViewPager {
                 view.setTag("week_number_" + week);
                 view.setTag(R.string.week_number, week);
                 bindWeekView(view, week, activeYear);
+                if (i == 1) {
+                    bindWeekTitles(view);
+                } else {
+                    view.findViewById(R.id.week_days_titles).setVisibility(View.GONE);
+                }
                 parent.addView(view);
                 week = calendar.getNextWeekOfTheMonth(activeYear, month, week);
             }
@@ -209,26 +214,25 @@ public class CalendarView extends ViewPager {
     }
 
     public void bindWeekTitles(View view) {
-        titleView = view;
+        TextView monTitle, tueTitle, wedTitle, thuTitle, friTitle, satTitle, sunTitle;
+        monTitle = (TextView) view.findViewById(R.id.monTitle);
+        tueTitle = (TextView) view.findViewById(R.id.tueTitle);
+        wedTitle = (TextView) view.findViewById(R.id.wedTitle);
+        thuTitle = (TextView) view.findViewById(R.id.thuTitle);
+        friTitle = (TextView) view.findViewById(R.id.friTitle);
+        satTitle = (TextView) view.findViewById(R.id.satTitle);
+        sunTitle = (TextView) view.findViewById(R.id.sunTitle);
+        monTitle.setText(calendar.getDayDisplayName(1, 1));
+        tueTitle.setText(calendar.getDayDisplayName(2, 1));
+        wedTitle.setText(calendar.getDayDisplayName(3, 1));
+        thuTitle.setText(calendar.getDayDisplayName(4, 1));
+        friTitle.setText(calendar.getDayDisplayName(5, 1));
+        satTitle.setText(calendar.getDayDisplayName(6, 1));
+        sunTitle.setText(calendar.getDayDisplayName(7, 1));
     }
 
     private void bindWeekView(View view, int weekOfYear, int activeYear) {
-        TextView monTitle, tueTitle, wedTitle, thuTitle, friTitle, satTitle, sunTitle;
-        monTitle = (TextView) titleView.findViewById(R.id.monTitle);
-        tueTitle = (TextView) titleView.findViewById(R.id.tueTitle);
-        wedTitle = (TextView) titleView.findViewById(R.id.wedTitle);
-        thuTitle = (TextView) titleView.findViewById(R.id.thuTitle);
-        friTitle = (TextView) titleView.findViewById(R.id.friTitle);
-        satTitle = (TextView) titleView.findViewById(R.id.satTitle);
-        sunTitle = (TextView) titleView.findViewById(R.id.sunTitle);
 
-        monTitle.setText(calendar.getDayDisplayName(1, weekOfYear));
-        tueTitle.setText(calendar.getDayDisplayName(2, weekOfYear));
-        wedTitle.setText(calendar.getDayDisplayName(3, weekOfYear));
-        thuTitle.setText(calendar.getDayDisplayName(4, weekOfYear));
-        friTitle.setText(calendar.getDayDisplayName(5, weekOfYear));
-        satTitle.setText(calendar.getDayDisplayName(6, weekOfYear));
-        sunTitle.setText(calendar.getDayDisplayName(7, weekOfYear));
 
         TextView monValue, tueValue, wedValue, thuValue, friValue, satValue, sunValue;
         monValue = (TextView) view.findViewById(R.id.monValue);
