@@ -342,7 +342,6 @@ public class CalendarView extends ViewPager {
     }
 
     private void focusOnDay(int day) {
-
         if (isMonthView) {
             // Resetting recent weeks view
             ViewGroup monthView = (ViewGroup) currentMonthView;
@@ -366,10 +365,18 @@ public class CalendarView extends ViewPager {
                 // to focus
                 currentWeekOfTheYear = dateInfo.weekOfYear;
                 dayView.setBackgroundResource(R.drawable.week_day_bg);
+
                 if (activeDate == null) {
-                    activeDate = dateInfo;
                     dayClick.onClick((View) dayView.getParent());
                 }
+                if (activeDate != dateInfo && mCalendarDateChangeListener != null) {
+                    mCalendarDateChangeListener.onCalendarDateChange(dateInfo);
+                    activeDate = dateInfo;
+                }
+                if (mOnMonthChangeListener != null) {
+                    mOnMonthChangeListener.onMonthChange(dateInfo);
+                }
+
             } else {
                 focusOnDate(dateInfo, dayView);
             }
@@ -386,6 +393,9 @@ public class CalendarView extends ViewPager {
         @Override
         public void onPageSelected(int position) {
             OdooCalendarAdapter adapter = (OdooCalendarAdapter) getAdapter();
+            if (mOnMonthChangeListener != null) {
+                mOnMonthChangeListener.onMonthChange(activeDate);
+            }
             if (!isMonthView) {
                 int weekDay = calendar.getWeekDaysDiff(activeYear);
                 int nextYearPosition = (weekDay % 7 == 0) ? adapter.getCount() - 1 : adapter.getCount() - 2;
@@ -405,12 +415,6 @@ public class CalendarView extends ViewPager {
                 recentClicked = null;
                 focusOnWeek(position);
             } else {
-                if (mOnMonthChangeListener != null) {
-                    DateInfo dateInfo = new DateInfo();
-                    dateInfo.monthOfYear = position;
-                    dateInfo.year = activeYear;
-                    mOnMonthChangeListener.onMonthChange(dateInfo);
-                }
                 if (position == 0) {
                     activeYear = activeYear - 1;
                     adapter.bindViews();
@@ -447,6 +451,7 @@ public class CalendarView extends ViewPager {
                 return;
             }
             DateInfo dateInfo = (DateInfo) view.getTag();
+            activeDate = dateInfo;
             focusDay = dateInfo.dayOfWeek - 1;
             focusOnDay(dateInfo.dayOfWeek);
             recentClicked = view;

@@ -3,6 +3,7 @@ package com.dpr.dpr.calendardemo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.dpr.calendar.listeners.CalendarDateChangeListener;
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements CalendarDateChang
 
     @Override
     public void onCalendarDateChange(DateInfo dateInfo) {
+        Log.v(">>>", dateInfo+ " <<");
         TextView date = (TextView) findViewById(R.id.selectedDate);
         date.setText(dateInfo.toString());
     }
