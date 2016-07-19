@@ -33,7 +33,7 @@ allprojects {
 
 ```gradle
 dependencies {
-    compile 'com.github.dpr-odoo:week-calendar:1.0'
+    compile 'com.github.dpr-odoo:week-calendar:2.0-rc1'
 }
 ```
 
